@@ -51,14 +51,16 @@ Shader "Unlit/TestiShader"
                 Varyings output;
 
                 output.positionHCS = TransformObjectToHClip(input.positionOS);
-                output.positionWS = TransformObjectToWorld(input.positionOS);
+                output.positionWS = input.normalsSO;
+                //output.positionWS = TransformObjectToWorld(input.normalsSO);
 
                 return output;
             }
 
             float4 Frag(const Varyings input) : SV_TARGET
             {
-                return _Color * clamp(0, 1, input.positionWS.x);
+                return float4(input.positionWS, 1);
+                //return _Color * clamp(0, 1, input.positionWS.x);
             }
 
             ENDHLSL
