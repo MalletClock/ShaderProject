@@ -32,7 +32,7 @@ Shader "Unlit/TestiShader"
             struct Attributes
             {
                 float3 positionOS : POSITION;
-                float3 normalsSO : NORMAL;
+                float3 normalsOS : NORMAL;
             };
 
             struct Varyings
@@ -51,7 +51,7 @@ Shader "Unlit/TestiShader"
                 Varyings output;
 
                 output.positionHCS = TransformObjectToHClip(input.positionOS);
-                output.positionWS = input.normalsSO;
+                output.positionWS = input.normalsOS;
                 //output.positionWS = TransformObjectToWorld(input.normalsSO);
 
                 return output;
