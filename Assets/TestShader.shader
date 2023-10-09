@@ -2,6 +2,8 @@ Shader "Unlit/TestiShader"
 {
     Properties
     {
+        [KeywordEnum(object space, world space, view space)]
+        _SpaceKeyword("Space", Float) = 0
         _Color("Color", Color) = (1, 1, 1, 1) 
     }
     SubShader
@@ -26,6 +28,7 @@ Shader "Unlit/TestiShader"
 
             #pragma vertex Vert
             #pragma fragment Frag
+            #pragma shader_feature_local _SPACEKEYWORD_OBJECT_SPACE _SPACEKEYWORD_WORLD_SPACE _SPACEKEYWORD_VIEW_SPACE
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/core.hlsl"
 
@@ -50,7 +53,22 @@ Shader "Unlit/TestiShader"
             {
                 Varyings output;
 
-                output.positionHCS = TransformObjectToHClip(input.positionOS);
+                /* Shorter */
+                // output.positionHCS = mul(UNITY_MATRIX_VP, mul(UNITY_MATRIX_M, float4(input.positionOS,1)));
+                //output.positionHCS = mul(UNITY_MATRIX_P, mul(UNITY_MATRIX_V, mul(UNITY_MATRIX_M, float4(input.positionOS,1))));
+                
+                #if _SPACEKEYWORD_OBJECT_SPACE
+                output.positionHCS = TransformObjectToHClip(input.positionOS + float3(0.f,1.f,0.f));
+
+                #elif _SPACEKEYWORD_WORLD_SPACE
+                const float3 positionWS = TransformObjectToWorld(input.positionOS) + float3(0.f,1.f,0.f);
+                output.positionHCS = TransformWorldToHClip(positionWS);
+                #elif _SPACEKEYWORD_VIEW_SPACE
+                const float3 positionVS = TransformWorldToView(TransformObjectToWorld(input.positionOS));
+                output.positionHCS = TransformWViewToHClip(positionVS + float4(0.f,1.f,0.f,1));
+                #endif
+                
+                
                 output.positionWS = input.normalsOS;
                 //output.positionWS = TransformObjectToWorld(input.normalsSO);
 
