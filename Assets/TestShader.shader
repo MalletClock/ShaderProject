@@ -1,4 +1,4 @@
-Shader "Unlit/TestiShader"
+Shader "Unlit/TestShader"
 {
     Properties
     {
@@ -55,11 +55,10 @@ Shader "Unlit/TestiShader"
 
                 /* Shorter */
                 // output.positionHCS = mul(UNITY_MATRIX_VP, mul(UNITY_MATRIX_M, float4(input.positionOS,1)));
-                //output.positionHCS = mul(UNITY_MATRIX_P, mul(UNITY_MATRIX_V, mul(UNITY_MATRIX_M, float4(input.positionOS,1))));
+                // output.positionHCS = mul(UNITY_MATRIX_P, mul(UNITY_MATRIX_V, mul(UNITY_MATRIX_M, float4(input.positionOS,1))));
                 
                 #if _SPACEKEYWORD_OBJECT_SPACE
                 output.positionHCS = TransformObjectToHClip(input.positionOS + float3(0.f,1.f,0.f));
-
                 #elif _SPACEKEYWORD_WORLD_SPACE
                 const float3 positionWS = TransformObjectToWorld(input.positionOS) + float3(0.f,1.f,0.f);
                 output.positionHCS = TransformWorldToHClip(positionWS);
@@ -70,7 +69,7 @@ Shader "Unlit/TestiShader"
                 
                 
                 output.positionWS = input.normalsOS;
-                //output.positionWS = TransformObjectToWorld(input.normalsSO);
+                //output.positionWS = TransformObjectToWorld(input.normalsOS);
 
                 return output;
             }
