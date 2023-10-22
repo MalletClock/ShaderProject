@@ -3,13 +3,13 @@ Shader "Unlit/Phong"
     Properties
     {
         _Shininess("Shininess", Range(1,200)) = 20
-        _Color("Color", Color) = (1, 1, 1, 1) 
+        _Color("Color", Color) = (1, 1, 1, 1)
     }
     SubShader
     {
         Tags
-        { 
-            "RenderType"="Opaque" 
+        {
+            "RenderType"="Opaque"
             "RenderPipeline" = "UniversalPipeline"
             "Queue" = "Geometry"
         }
@@ -24,7 +24,6 @@ Shader "Unlit/Phong"
             }
 
             HLSLPROGRAM
-
             #pragma vertex Vert
             #pragma fragment Frag
 
@@ -46,8 +45,8 @@ Shader "Unlit/Phong"
             };
 
             CBUFFER_START(UnityPerMaterial)
-            float4 _Color;
-            float _Shininess;
+                float4 _Color;
+                float _Shininess;
             CBUFFER_END
 
 
@@ -65,21 +64,63 @@ Shader "Unlit/Phong"
             float4 BlinnPhong(const Varyings input) : SV_TARGET
             {
                 Light mainLight = GetMainLight();
-                
-                half3 ambientLighting = mainLight.color *0.1f;
+
+                half3 ambientLighting = mainLight.color * 0.1f;
                 half3 diffuseLighting = saturate(dot(input.normalWS, mainLight.direction)) * mainLight.color;
                 half3 halfVector = normalize(mainLight.direction + GetWorldSpaceNormalizeViewDir(input.positionWS));
                 half3 specularLighting = pow(saturate(dot(input.normalWS, halfVector)), _Shininess) * mainLight.color;
-                    
-                return float4((ambientLighting + diffuseLighting + specularLighting) *_Color, 1);
+
+                return float4((ambientLighting + diffuseLighting + specularLighting) * _Color, 1);
             }
-            
+
             float4 Frag(const Varyings input) : SV_TARGET
             {
                 //return _Color;
                 return BlinnPhong(input);
             }
+            ENDHLSL
+        }
 
+        Pass
+        {
+            Name "Depth"
+            Tags
+            {
+                "LightMode" = "DepthOnly"
+            }
+
+            Cull Back
+            ZTest LEqual
+            ZWrite On
+            ColorMask R
+
+            HLSLPROGRAM
+            #pragma vertex DepthVert
+            #pragma fragment DepthFrag
+
+            // PITÄÄ OLLA RELATIVE PATH TIEDOSTOON!!!
+            #include "DepthPass.hlsl"
+            ENDHLSL
+
+        }
+
+        Pass
+        {
+            Name "Normals"
+            Tags
+            {
+                "LightMode" = "DepthNormalsOnly"
+            }
+
+            Cull Back
+            ZTest LEqual
+            ZWrite On
+
+            HLSLPROGRAM
+            #pragma vertex DepthNormalsVert
+            #pragma fragment DepthNormalsFrag
+
+            #include "DepthNormalsPass.hlsl"
             ENDHLSL
         }
     }
