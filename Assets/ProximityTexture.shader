@@ -1,11 +1,10 @@
-Shader "Unlit/TextureShader"
+Shader "Unlit/ProximityTexture"
 {
     Properties
     {
         _MainTex ("Texture", 2D) = "white" {}
-        _SecondaryTex ("Texture", 2D) = "white" {}
-        _ScrollSpeeds ("ScrollSpeeds", Vector) = (0, 0, 0, 0)
-        _Blend ("Blend Value", Range(0,1)) = 0
+        _PlayerPosition("Player Position", Vector) = (0, 0, 0, 0)
+        _DistanceAttenuation("Player Position", Range(1, 10)) = 1
     }
     SubShader
     {
@@ -17,7 +16,7 @@ Shader "Unlit/TextureShader"
 
         Pass
         {
-            Name "TexturePass"
+            Name "ProximityTexturePass"
             
             HLSLPROGRAM
             #pragma vertex Vert
@@ -25,12 +24,20 @@ Shader "Unlit/TextureShader"
 
             #include "Packages/com.unity.render-pipelines.universal/ShaderLibrary/Core.hlsl"
 
+            TEXTURE2D(_MainTex);
+            SAMPLER(sampler_MainTex);
+            
+            CBUFFER_START(UnityPerMaterial)
+            float4 _MainTex_ST;
+            float3 _PlayerPosition;
+            float _DistanceAttenuation;
+            CBUFFER_END
+            
             // input
             struct Attributes
             {
                 float3 positionOS : POSITION;
                 float2 uv : TEXCOORD0;
-                float2 uv2 : TEXCOORD1;
             };
 
             // output
@@ -38,39 +45,32 @@ Shader "Unlit/TextureShader"
             {
                 float4 positionHCS : SV_POSITION;
                 float2 uv : TEXCOORD0;
-                float2 uv2 : TEXCOORD1;
+                float3 positionWS : TEXCOORD1;
             };
             
-            TEXTURE2D(_MainTex);
-            TEXTURE2D(_SecondaryTex);
-            SAMPLER(sampler_MainTex);
-            SAMPLER(sampler_SecondaryTex);
-            float4 _ScrollSpeeds;
-            float _Blend;
             
-            CBUFFER_START(UnityPerMaterial)
-            float4 _MainTex_ST;
-            float4 _SecondaryTex_ST;
-            CBUFFER_END
 
             Varyings Vert (const Attributes input)
             {
                 Varyings output;
                 
-                output.positionHCS = TransformObjectToHClip(input.positionOS);
-                output.uv = input.uv * _MainTex_ST.xy + (_MainTex_ST.zw + _Time * _ScrollSpeeds);
-                
+                output.positionHCS = TransformObjectToHClip(input.positionOS.xyz);
+                output.positionWS = TransformObjectToWorld(input.positionOS.xyz);
+                output.uv = input.uv;
                 return output;
             }
 
             float4 Frag (const Varyings input) : SV_Target
             {
-                float4 MainColor = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
-                float4 SecondaryColor = SAMPLE_TEXTURE2D(_SecondaryTex, sampler_SecondaryTex, input.uv);
-                // sample the texture
-                return lerp(MainColor, SecondaryColor, _Blend);
-                //return lerp(MainColor, SecondaryColor, (sin(input.uv * _MainTex_ST.xy + _MainTex_ST.zw).x * 5) +1)/2;
+                //return SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, input.uv);
+                const float4 color1 = SAMPLE_TEXTURE2D(_MainTex, sampler_MainTex, TRANSFORM_TEX(input.uv, _MainTex));
+
                 
+                float distance = length(_PlayerPosition - input.positionWS);
+                distance = saturate(1 - distance / _DistanceAttenuation);
+                
+                return lerp(0, color1 ,distance);
+                //return distance;
             }
             ENDHLSL
         }
