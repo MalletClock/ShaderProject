@@ -167,14 +167,14 @@ Shader "Unlit/SurfaceShader"
             }
 
 
-            // NOT YET READY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            
             half3 SampleMetallic(const float2 uv)
             {
                 return SAMPLE_TEXTURE2D(_MetallicMap, sampler_MetallicMap, uv);
             }
 
 
-            // NOT YET READY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            
             float SampleRoughness(const float2 uv)
             {
                 float4 _SampleTexture2D_RGBA = SAMPLE_TEXTURE2D(_MetallicMap, sampler_MetallicMap, uv);
@@ -183,7 +183,7 @@ Shader "Unlit/SurfaceShader"
                 return SAMPLE_TEXTURE2D(_RoughnessMap, sampler_RoughnessMap, uv);
             }
             
-            // NOT YET READY!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+          
             half3 SampleOcclusion(const float2 uv)
             {
                 return SAMPLE_TEXTURE2D(_OcclusionMap, sampler_OcclusionMap, uv);
