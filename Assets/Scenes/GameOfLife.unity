@@ -223,7 +223,7 @@ MonoBehaviour:
   PlaneMaterial: {fileID: 2100000, guid: 50741902bfa6dc544a280654f09f4c89, type: 2}
   CellCol: {r: 1, g: 1, b: 1, a: 1}
   Simulator: {fileID: 7200000, guid: 64f4586a8dd0cc149b97c9108a307c5f, type: 3}
-  UpdateInterval: 0.251
+  UpdateInterval: 0
 --- !u!1 &218814413
 GameObject:
   m_ObjectHideFlags: 0

@@ -89,7 +89,9 @@ public class GameOfLife : MonoBehaviour
 
         Simulator.SetTexture(Update2Kernel, State1Tex, State1);
         Simulator.SetTexture(Update2Kernel, State2Tex, State2);
-        
+
+        Simulator.SetTexture(Update1Kernel, BaseMap, State1);
+        Simulator.SetTexture(Update2Kernel, BaseMap, State2);
 
         // Vaihtoehtoisesti:
         Simulator.SetTexture(seedKernel, State1Tex, State1);
@@ -106,8 +108,7 @@ public class GameOfLife : MonoBehaviour
 
         Simulator.Dispatch(seedKernel, TexSize.x / 8, TexSize.y / 8, 1);
 
-        Simulator.SetTexture(Update1Kernel, BaseMap, State1);
-        Simulator.SetTexture(Update2Kernel, BaseMap, State2);
+        
     }
 
     void Update()
@@ -118,12 +119,11 @@ public class GameOfLife : MonoBehaviour
         // Scriptin tulisi myös pitää kirjaa, kummassa vaiheessa simulaatiota ollaan,
         // ja päättää sen mukaan, kumpi vaihe suorittaa.
         IsState1 = !IsState1;
-
+        
         // Scriptin kuuluisi myös päivittää esitykseen käytetyn materiaalin tekstuuria
         // vaiheen mukaan (flipbook).
         Simulator.Dispatch(Update1Kernel, TexSize.x / 8, TexSize.y / 8, 1);
         Simulator.Dispatch(Update2Kernel, TexSize.x / 8, TexSize.y / 8, 1);
-        //PlaneMaterial.SetTexture(BaseMap, State1);
         PlaneMaterial.SetTexture(BaseMap, IsState1 ? State1 : State2);
 
         NextUpdate = Time.time + UpdateInterval;

@@ -36,8 +36,7 @@ void Update1 (uint3 id : SV_DispatchThreadID)
     neighborPixels += tex2Dlod(_BaseMap, float4(position.x + pixelSize.x, position.y - pixelSize.y, 0, 0));
     neighborPixels += tex2Dlod(_BaseMap, float4(position.x, position.y - pixelSize.y, 0, 0));
     neighborPixels += tex2Dlod(_BaseMap, float4(position.x - pixelSize.x, position.y - pixelSize.y, 0, 0));
-    // Add current pixel for reason
-    //neighborPixels += currentPixel;
+
 
     if (currentPixel.r > 0.5) {
         if (neighborPixels.r > 1.5 && neighborPixels.r < 3.5) { //Between 2 and 3
@@ -55,24 +54,6 @@ void Update1 (uint3 id : SV_DispatchThreadID)
             State2[id.xy] = float4(0, 0, 0, 1);
         }
     }
-    
-    // int sum = 0;
-    // for (int x = -1; x <= 1; x++) {
-    //     for (int y = -1; y <= 1; y++) {
-    //         if (x == 0 && y == 0) continue;            
-    //         if (State1[id.xy + float2(x,y)].x > 0) sum++;
-    //     }
-    // }
-    //
-    // if (State1[id.xy].x > 0) 
-    // {
-    //     State2[id.xy] = (sum == 2 || sum == 3) ? CellColour : float4(0,0,0,1);
-    // }
-    // else 
-    // {
-    //     State2[id.xy] = (sum == 3) ? CellColour : float4(0,0,0,1);
-    // }
-    // //State1[id.xy] = CellColour;
 }
 
 [numthreads(8,8,1)]
@@ -96,8 +77,6 @@ void Update2 (uint3 id : SV_DispatchThreadID)
     neighborPixels += tex2Dlod(_BaseMap, float4(position.x + pixelSize.x, position.y - pixelSize.y, 0, 0));
     neighborPixels += tex2Dlod(_BaseMap, float4(position.x, position.y - pixelSize.y, 0, 0));
     neighborPixels += tex2Dlod(_BaseMap, float4(position.x - pixelSize.x, position.y - pixelSize.y, 0, 0));
-    // Add current pixel for reason
-    //neighborPixels += currentPixel;
 
     if (currentPixel.r > 0.5) {
         if (neighborPixels.r > 1.5 && neighborPixels.r < 3.5) { //Between 2 and 3
@@ -115,24 +94,6 @@ void Update2 (uint3 id : SV_DispatchThreadID)
             State1[id.xy] = float4(0, 0, 0, 1);
         }
     }
-
-    //int sum = 0;
-    //for (int x = -1; x <= 1; x++) {
-    //    for (int y = -1; y <= 1; y++) {
-    //        if (x == 0 && y == 0) continue;            
-    //        if (State2[id.xy + float2(x,y)].x > 0) sum++;
-    //    }
-    //}
-    //
-    //if (State2[id.xy].x > 0) 
-    //{
-    //    State1[id.xy] = (sum == 2 || sum == 3) ? CellColour : float4(0,0,0,1);
-    //}
-    //else 
-    //{
-    //    State1[id.xy] = (sum == 3) ? CellColour : float4(0,0,0,1);
-    //}
-    ////State2[id.xy] = float4(0,0,0,1);
 }
 
 
